@@ -143,6 +143,7 @@ with st.container():
             "My expertise lies in both creating intelligent systems with AI and developing "
             "robust, user-friendly software applications."
         )
+        st.info("🚧 This portfolio is evolving—check back soon for more!")
         st.link_button("My LinkedIn Profile", "https://linkedin.com/in/devanshu-shah777/", use_container_width=False)
     with right_column:
         st.empty()  # No animation, keep layout clean
