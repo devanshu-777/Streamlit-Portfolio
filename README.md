@@ -18,7 +18,7 @@ The app is easy to customize and deploy, making it ideal for students, developer
 ### 1. Clone the repository
 
 ```sh
-git clone https://github.com/YOUR-USERNAME/REPO-NAME.git
+git clone https://github.com/devanshu-777/Streamlit-Portfolio.git
 cd REPO-NAME
 ```
 
