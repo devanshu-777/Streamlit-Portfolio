@@ -1,42 +1,21 @@
-# --- IMPORTS ---
-import streamlit as st  # Streamlit for web app
-from PIL import Image  # For image processing
-import requests  # For HTTP requests (fetching images)
+import streamlit as st
+from PIL import Image
+import requests
+from io import BytesIO
+from PIL import UnidentifiedImageError
+from pathlib import Path
 
-
-# --- PAGE CONFIGURATION ---
-# Set up the Streamlit page (title, icon, layout)
 st.set_page_config(
-    page_title="My Portfolio",
+    page_title="Devanshu Shah",
     page_icon="🤖",
     layout="wide",
+    initial_sidebar_state="collapsed",
 )
 
-
-# --- HELPER FUNCTIONS & STYLE ---
-
-
-# Inject custom CSS from a file (not used in this example)
-def local_css(file_name):
-    with open(file_name) as f:
-        st.markdown(f"<style>{f.read()}</style>", unsafe_allow_html=True)
-
-
-# --- CUSTOM CSS ---
-# For this example, we'll embed the CSS directly to keep it in one file.
-# In a real project, you might use local_css("style/style.css")
 CSS = """
-/* Hide Streamlit's default menu and footer */
 #MainMenu {visibility: hidden;}
 footer {visibility: hidden;}
-/* header {visibility: hidden;}  Removed to restore sidebar toggle button */
 
-/* General body styling */
-body {
-    background-color: #f0f2f6;
-}
-
-/* Custom button styling */
 .stButton>button {
     border: 2px solid #4A90E2;
     border-radius: 20px;
@@ -54,24 +33,35 @@ body {
     outline: none !important;
     box-shadow: none !important;
 }
+
+.contact-form {
+    max-width: 600px;
+    margin: 0 auto;
+}
+.blog-card {
+    background: #ffffff;
+    border-radius: 12px;
+    padding: 0;
+    margin-bottom: 20px;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+    overflow: hidden;
+}
+.blog-card img {
+    width: 100%;
+    border-radius: 12px 12px 0 0;
+}
+.blog-card .content {
+    padding: 15px;
+}
 """
+
 st.markdown(f"<style>{CSS}</style>", unsafe_allow_html=True)
 
+def local_css(file_name):
+    with open(file_name) as f:
+        st.markdown(f"<style>{f.read()}</style>", unsafe_allow_html=True)
 
-# --- ASSETS ---
-
-
-# Function to load images with fallback to a placeholder
-from io import BytesIO
-from PIL import UnidentifiedImageError
-
-
-# Helper to load image from URL or local file, with fallback to a generated placeholder
 def load_image(path_or_url, fallback_size=(300, 300), fallback_color=(52, 152, 219)):
-    """
-    Loads an image from a local file or a URL.
-    If loading fails, returns a simple colored placeholder image.
-    """
     try:
         if path_or_url.startswith("http://") or path_or_url.startswith("https://"):
             response = requests.get(path_or_url)
@@ -80,18 +70,13 @@ def load_image(path_or_url, fallback_size=(300, 300), fallback_color=(52, 152, 2
                     return Image.open(BytesIO(response.content))
                 except UnidentifiedImageError:
                     pass
-            # If failed, fall through to fallback
         else:
             return Image.open(path_or_url)
     except (FileNotFoundError, UnidentifiedImageError):
         pass
-    # Fallback: generate a simple placeholder image
     img = Image.new("RGB", fallback_size, fallback_color)
     return img
 
-
-# --- PROFILE PICTURE ---
-# Try to load a local profile image (jpeg, jpg, png), else use a placeholder
 profile_pic = None
 for fname in ["profile.jpeg", "profile.jpg", "profile.png"]:
     try:
@@ -104,54 +89,75 @@ if profile_pic is None:
         "https://placehold.co/300x300/3498DB/FFFFFF?text=Your%20Photo&font=inter"
     )
 
-
-# --- PROJECT IMAGES (use placeholders) ---
 project_image_1 = load_image("AI-Project.png")
 project_image_2 = load_image("Microservices-Project.png")
 
-
-# --- RESUME LINKS ---
-# Add your actual resume links here
 AI_RESUME_URL = "https://www.dropbox.com/scl/fi/f3tkpi0dt91gzdx3hfktd/Devanshu-Shah_Resume.pdf?rlkey=kygig2c60pfu803rcdd2w7duj&dl=0"
-SE_RESUME_URL = AI_RESUME_URL  # Replace with your SE resume link
 
+def load_blog_posts():
+    posts = []
+    blog_dir = Path("blog")
+    if not blog_dir.exists():
+        return posts
+    for post_dir in sorted(blog_dir.iterdir()):
+        if not post_dir.is_dir():
+            continue
+        md_file = post_dir / "post.md"
+        if not md_file.exists():
+            continue
+        with open(md_file) as f:
+            content = f.read()
+        images = []
+        for f in sorted(post_dir.iterdir()):
+            if f.suffix.lower() in (".jpg", ".jpeg", ".png", ".webp") and f.name != "post.md":
+                images.append(load_image(str(f)))
+        title_line = content.strip().split("\n")[0].replace("## ", "").replace("# ", "")
+        posts.append({"content": content, "images": images, "title": title_line, "slug": post_dir.name})
+    return list(reversed(posts))
 
-# --- SIDEBAR ---
-# Sidebar with profile, contact, and resume links
 with st.sidebar:
-    st.image(profile_pic, width=250)
-    st.title("Devanshu Shah")
-    st.subheader("AI Enthusiast & Software Engineer")
-    st.write("📧 devanshu720@gmail.com")
-    st.subheader("Download Resumes")
-    st.link_button("Data Science Resume", AI_RESUME_URL, use_container_width=True)
-    st.link_button("Software Engineer Resume", SE_RESUME_URL, use_container_width=True)
+    st.title("📝 Blog")
+    blog_posts = load_blog_posts()
+    if not blog_posts:
+        st.write("No posts yet. Check back soon!")
+    for post in blog_posts:
+        for img in post["images"]:
+            st.image(img, width='stretch')
+        st.markdown(post["content"])
+        st.divider()
 
-
-# --- MAIN CONTENT ---
-
-# --- HERO SECTION ---
-# Top section with intro (removed animation for simplicity)
 with st.container():
-    left_column, right_column = st.columns((2, 1))
-    with left_column:
-        st.subheader("Hi, I am Devanshu 👋")
-        st.write(
-            "I am passionate about leveraging technology to build innovative solutions. "
-            "My expertise lies in both creating intelligent systems with AI and developing "
-            "robust, user-friendly software applications."
-        )
-        st.info("🚧 This portfolio is evolving, check back soon for more!")
-        st.link_button(
-            "My LinkedIn Profile",
-            "https://linkedin.com/in/devanshu-shah777/",
-            use_container_width=False,
-        )
-    with right_column:
-        st.empty()  # No animation, keep layout clean
+    col1, col2 = st.columns([1, 2.5])
+    with col1:
+        st.image(profile_pic, width=200)
+    with col2:
+        st.title("Devanshu Shah")
+        st.write("📧 devanshu720@gmail.com")
+        st.write("AI Enthusiast & Software Engineer")
+        bcol1, bcol2 = st.columns(2)
+        with bcol1:
+            st.link_button(
+                "🔗 My LinkedIn Profile",
+                "https://linkedin.com/in/devanshu-shah777/",
+                width='stretch',
+            )
+        with bcol2:
+            st.link_button(
+                "📄 Data Science Resume",
+                AI_RESUME_URL,
+                width='stretch',
+            )
 
-# --- WHAT I DO ---
-# Section describing your main skills/roles
+with st.container():
+    st.write("---")
+    st.subheader("Hi, I am Devanshu 👋")
+    st.write(
+        "I am passionate about leveraging technology to build innovative solutions. "
+        "My expertise lies in both creating intelligent systems with AI and developing "
+        "robust, user-friendly software applications."
+    )
+    st.info("🚧 This portfolio is evolving, check back soon for more!")
+
 with st.container():
     st.write("---")
     st.header("What I Do")
@@ -177,8 +183,6 @@ with st.container():
             """
         )
 
-# --- SKILLS ---
-# List of your technical skills
 with st.container():
     st.write("---")
     st.header("My Skills")
@@ -192,8 +196,6 @@ with st.container():
         """
     )
 
-# --- PROJECTS ---
-# Highlight your projects with images and descriptions
 with st.container():
     st.write("---")
     st.header("My Projects")
@@ -236,9 +238,6 @@ with st.container():
             "View on GitHub", "https://github.com/your-username/microservices-ecommerce"
         )
 
-
-# --- CONTACT FORM ---
-# Contact form using formsubmit.co (replace with your email)
 with st.container():
     st.write("---")
     st.header("Get In Touch!")
@@ -251,7 +250,20 @@ with st.container():
         name = st.text_input("Your Name")
         email = st.text_input("Your Email")
         message = st.text_area("Your Message")
-        submitted = st.form_submit_button("Send")
+        submitted = st.form_submit_button("Send Message", width='stretch')
 
         if submitted:
-            st.success("Thank you for reaching out! I'll get back to you soon.")
+            if name and email and message:
+                try:
+                    r = requests.post(
+                        "https://formspree.io/f/mkodnard",
+                        data={"name": name, "email": email, "message": message},
+                    )
+                    if r.status_code == 200:
+                        st.success("Thanks! I'll get back to you soon. ✅")
+                    else:
+                        st.error("Something went wrong. Please try again or email me directly.")
+                except requests.exceptions.RequestException:
+                    st.error("Network error. Please try again later.")
+            else:
+                st.warning("Please fill in all fields.")
