@@ -1,4 +1,6 @@
 import streamlit as st
+import os
+import time
 from PIL import Image
 import requests
 from io import BytesIO
@@ -57,6 +59,9 @@ def apply_theme():
     }}
     section[data-testid="stSidebar"] a {{
         color: #6c8cff !important;
+    }}
+    section[data-testid="stSidebar"] hr {{
+        border-color: #ffffff !important;
     }}
     </style>
     """, unsafe_allow_html=True)
@@ -152,13 +157,17 @@ def load_blog_posts():
         if not md_file.exists():
             continue
         with open(md_file) as f:
-            content = f.read()
+            lines = f.readlines()
+        content = "".join(lines)
         images = []
         for f in sorted(post_dir.iterdir()):
             if f.suffix.lower() in (".jpg", ".jpeg", ".png", ".webp") and f.name != "post.md":
                 images.append(load_image(str(f)))
-        title_line = content.strip().split("\n")[0].replace("## ", "").replace("# ", "")
-        posts.append({"content": content, "images": images, "title": title_line, "slug": post_dir.name})
+        title_line = lines[0].strip().replace("## ", "").replace("# ", "")
+        remaining = "".join(lines[1:]).strip()
+        mod_time = os.path.getmtime(md_file)
+        mod_date = time.strftime("%b %d, %Y", time.localtime(mod_time))
+        posts.append({"content": remaining or content, "images": images, "title": title_line, "slug": post_dir.name, "date": mod_date})
     return list(reversed(posts))
 
 with st.sidebar:
@@ -167,6 +176,7 @@ with st.sidebar:
     if not blog_posts:
         st.write("No posts yet. Check back soon!")
     for post in blog_posts:
+        st.markdown(f"**{post['title']}**  \n*{post['date']}*")
         for img in post["images"]:
             st.image(img, width='stretch')
         st.markdown(post["content"])
