@@ -12,26 +12,72 @@ st.set_page_config(
     initial_sidebar_state="collapsed",
 )
 
+if "dark_mode" not in st.session_state:
+    st.session_state.dark_mode = True
+
+def apply_theme():
+    is_dark = st.session_state.dark_mode
+    bg = "#0f1117" if is_dark else "#f0f2f6"
+    bg2 = "#1a1d29" if is_dark else "#ffffff"
+    text = "#e4e6f0" if is_dark else "#000000"
+    border = "#2a2e42" if is_dark else "#e0e0e0"
+    accent = "#6c8cff" if is_dark else "#4A90E2"
+    info_bg = "#1a2744" if is_dark else "#d1e7ff"
+    info_text = "#a0c4ff" if is_dark else "#0c4a6e"
+    st.markdown(f"""
+    <style>
+    .stApp, .main, .block-container {{ background-color: {bg} !important; }}
+    h1, h2, h3, h4, h5, h6, p, li, span:not(.st-badge), .stMarkdown, .stText {{
+        color: {text} !important;
+    }}
+    button[data-testid], button[data-testid] * {{
+        color: {accent} !important;
+    }}
+    [data-testid="stLinkButton"], [data-testid="stLinkButton"] * {{
+        color: #ffffff !important;
+    }}
+    button[data-testid]:hover, button[data-testid]:hover * {{
+        background-color: {accent} !important;
+        color: {"#0f1117" if is_dark else "#ffffff"} !important;
+    }}
+    [data-testid="stLinkButton"]:hover, [data-testid="stLinkButton"]:hover * {{
+        background-color: #4A90E2 !important;
+        color: white !important;
+    }}
+    hr {{ border-color: {border} !important; }}
+    .stAlert, .stInfo {{ background-color: {bg2} !important; color: {text} !important; }}
+    .stInfo {{ background-color: {info_bg} !important; color: {info_text} !important; }}
+    input, textarea, .stTextInput>div>div>input, .stTextArea>div>div>textarea {{
+        background-color: {bg2} !important;
+        color: {text} !important;
+        border-color: {border} !important;
+    }}
+    section[data-testid="stSidebar"] * {{
+        color: #e4e6f0 !important;
+    }}
+    section[data-testid="stSidebar"] a {{
+        color: #6c8cff !important;
+    }}
+    </style>
+    """, unsafe_allow_html=True)
+
+apply_theme()
+
 CSS = """
 #MainMenu {visibility: hidden;}
 footer {visibility: hidden;}
 
-.stButton>button {
+.stButton>button, button[data-testid] {
     border: 2px solid #4A90E2;
     border-radius: 20px;
-    color: #4A90E2;
     padding: 10px 24px;
-    background-color: transparent;
+    background-color: transparent !important;
     transition: all 0.3s ease-in-out;
+    text-decoration: none;
 }
-.stButton>button:hover {
-    background-color: #4A90E2;
-    color: white;
-    border-color: #4A90E2;
-}
-.stButton>button:focus {
-    outline: none !important;
-    box-shadow: none !important;
+.stButton>button:hover, button[data-testid]:hover, button[data-testid]:hover * {
+    background-color: #4A90E2 !important;
+    color: white !important;
 }
 
 .contact-form {
@@ -116,7 +162,7 @@ def load_blog_posts():
     return list(reversed(posts))
 
 with st.sidebar:
-    st.title("📝 Blog (Easter Egg)")
+    st.title("📝 Blogs (Easter Egg)")
     blog_posts = load_blog_posts()
     if not blog_posts:
         st.write("No posts yet. Check back soon!")
@@ -167,7 +213,7 @@ with st.container():
         st.write(
             """
             - Developing predictive models and machine learning algorithms.
-            - Working with Natural Language Processing (NLP) and Large Language Models (LLMs).
+            - Working with Natural Language Processing and Large Language Models.
             - Analyzing complex datasets to extract valuable insights.
             - Building AI-powered features to enhance application intelligence.
             """
@@ -188,11 +234,12 @@ with st.container():
     st.header("My Skills")
     st.write(
         """
-        - **Languages:** Python, Java, C++, JavaScript, SQL
-        - **AI/ML:** TensorFlow, PyTorch, Scikit-learn, Pandas, LangChain, Hugging Face
-        - **Web Development:** React, Node.js, HTML/CSS, Streamlit, Flask
-        - **Databases:** MySQL, PostgreSQL, MongoDB, Firebase
-        - **Tools & Platforms:** Git, Docker, Kubernetes, AWS, Google Cloud
+        - **AI & LLM:** LangChain, MCP, vLLM, LiteLLM, Opik, ChromaDB, Streamlit, PyTorch, TensorFlow, Scikit-Learn, XGBoost, Pandas
+        - **Cloud & DevOps:** AWS, Google Cloud, Terraform, Docker, Kubernetes, Helm, Tilt, Istio, ArgoCD, GitOps, CI/CD, Zarf, UDS, k3d, mise
+        - **Languages:** Python, Go, SQL, JavaScript, Bash, HTML, CSS
+        - **Backend & Big Data:** FastAPI, REST, gRPC, GraphQL, Protobuf, Flask, Django, Apache Spark, Apache Iceberg, Databricks, lakeFS, MinIO
+        - **Databases, Search & BI:** PostgreSQL, MongoDB, Redis, ElasticSearch, MySQL, OpenSearch, Apache AGE, Tableau, Power BI
+        - **Certifications:** AWS Certified - AI Practitioner, NVIDIA - Getting Started with Deep Learning
         """
     )
 
@@ -268,3 +315,15 @@ with st.container():
                     st.error("Network error. Please try again later.")
             else:
                 st.warning("Please fill in all fields.")
+
+with st.container():
+    st.write("---")
+    f1, f2, f3 = st.columns([1, 2, 1])
+    with f1:
+        st.toggle("☀️ Light" if not st.session_state.dark_mode else "🌙 Dark", key="dark_mode")
+    with f3:
+        st.markdown(
+            "<p style='text-align:right;font-size:14px;padding-top:8px;'>"
+            "Built with Streamlit • © 2026 Devanshu Shah</p>",
+            unsafe_allow_html=True,
+        )
