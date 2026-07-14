@@ -257,9 +257,10 @@ with st.container():
                 try:
                     r = requests.post(
                         "https://formspree.io/f/mkodnard",
+                        headers={"Accept": "application/json"},
                         data={"name": name, "email": email, "message": message},
                     )
-                    if r.status_code == 200:
+                    if r.ok:
                         st.success("Thanks! I'll get back to you soon. ✅")
                     else:
                         st.error("Something went wrong. Please try again or email me directly.")
