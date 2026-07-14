@@ -116,7 +116,7 @@ def load_blog_posts():
     return list(reversed(posts))
 
 with st.sidebar:
-    st.title("📝 Blog")
+    st.title("📝 Blog (Easter Egg)")
     blog_posts = load_blog_posts()
     if not blog_posts:
         st.write("No posts yet. Check back soon!")
