@@ -8,7 +8,7 @@ from PIL import UnidentifiedImageError
 from pathlib import Path
 
 st.set_page_config(
-    page_title="Devanshu Shah",
+    page_title="Devansh Shah",
     page_icon="🤖",
     layout="wide",
     initial_sidebar_state="collapsed",
@@ -143,7 +143,7 @@ if profile_pic is None:
 project_image_1 = load_image("AI-Project.png")
 project_image_2 = load_image("Microservices-Project.png")
 
-AI_RESUME_URL = "https://www.dropbox.com/scl/fi/f3tkpi0dt91gzdx3hfktd/Devanshu-Shah_Resume.pdf?rlkey=kygig2c60pfu803rcdd2w7duj&dl=0"
+AI_RESUME_URL = "https://www.dropbox.com/scl/fi/j7i6kpgzeffz6vj0gyjo9/Devansh-Shah-Resume.pdf?rlkey=5ivofne11jbc6tk357h2fvezw&dl=0"
 
 def load_blog_posts():
     posts = []
@@ -187,14 +187,14 @@ with st.container():
     with col1:
         st.image(profile_pic, width=200)
     with col2:
-        st.title("Devanshu Shah")
-        st.write("📧 devanshu720@gmail.com")
+        st.title("Devansh Shah")
+        st.write("📧 devansh.shah.tech@gmail.com")
         st.write("AI Enthusiast & Software Engineer")
         bcol1, bcol2 = st.columns(2)
         with bcol1:
             st.link_button(
                 "🔗 My LinkedIn Profile",
-                "https://linkedin.com/in/devanshu-shah777/",
+                "https://linkedin.com/in/devanshshah-tech/",
                 width='stretch',
             )
         with bcol2:
@@ -206,7 +206,7 @@ with st.container():
 
 with st.container():
     st.write("---")
-    st.subheader("Hi, I am Devanshu 👋")
+    st.subheader("Hi, I am Devansh 👋")
     st.write(
         "I am passionate about leveraging technology to build innovative solutions. "
         "My expertise lies in both creating intelligent systems with AI and developing "
@@ -334,6 +334,6 @@ with st.container():
     with f3:
         st.markdown(
             "<p style='text-align:right;font-size:14px;padding-top:8px;'>"
-            "Built with Streamlit • © 2026 Devanshu Shah</p>",
+            "Built with Streamlit • © 2026 Devansh Shah</p>",
             unsafe_allow_html=True,
         )
